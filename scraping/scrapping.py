@@ -1,25 +1,10 @@
+import json
 from random import choice
-import os
-import sys
-
-from bs4 import BeautifulSoup as BS
 import requests
-
-from django.db import DatabaseError
-
-proj = os.path.dirname(os.path.abspath('manage.py'))
-
-sys.path.append(proj)
-
-os.environ['DJANGO_SETTINGS_MODULE'] = 'iFreelance.settings'
-
-import django
-django.setup()
-
-from jobs.models import Job
+from bs4 import BeautifulSoup as BS
 
 
-
+url = 'https://freelance.habr.com/tasks'
 
 headers = [
     {'User-Agent': 'Mozilla/5.0 (Windows NT 5.1; rv:47.0) Gecko/20100101 Firefox/47.0',
@@ -31,8 +16,7 @@ headers = [
 ]
 
 
-def habr_parsing():
-    url = 'https://freelance.habr.com/tasks
+def habr_parsing(url):
     jobs = []
     res = requests.get(url, headers=choice(headers))
     if res.status_code == 200:
@@ -54,17 +38,8 @@ def habr_parsing():
                         'views': views, 'responses': responses, 'time': time})
 
     return jobs
+# with open('jobs.json', 'a', encoding='utf-8') as f:
+#     json.dump(jobs, f, indent=4, ensure_ascii=False)
 
-def save_jobs():
-    habr_jobs = habr_parsing()
-    for job in habr_jobs:
-        j = Job(**job)
-        try:   
-            j.save()
-        except DatabaseError:
-            pass
-
-if __name__ == '__main__':
-    save_jobs()
         
         
